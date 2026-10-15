@@ -1,0 +1,13 @@
+// Shared demo Marketing bot page. Nothing is ever posted.
+const MK_PLAT=[['ig','Instagram','Business/Creator account'],['fb','Facebook Page','via Meta Business Suite'],['tt','TikTok','Business account'],['gbp','Google Business Profile','Posts & updates'],['wa','WhatsApp Channel','Broadcast updates']];
+function mkData(){if(!D.mk){D.mk={con:{},posts:(window.MK_SEED||[]).map((p,i)=>({id:i+1,...p,st:'Awaiting approval'}))};save()}return D.mk}
+function mkView(){const M=mkData(),cal=[...Array(14)].map((_,i)=>new Date(Date.now()+i*864e5).toISOString().slice(0,10));
+return `<h2>Marketing bot</h2><p class="muted">The bot drafts posts from your work and photos. You approve. Demo mode: nothing is ever really posted.</p>
+<h3>Connect accounts</h3><div class="grid">${MK_PLAT.map(([k,n,d])=>`<div class="card"><b>${n}</b><div class="muted">${d}</div><p>${M.con[k]?'<span class="pill done">Connected (demo)</span>':`<button class="btn sm" onclick="mkCon('${k}')">Connect</button>`}</p></div>`).join('')}</div>
+<h3>Awaiting approval</h3><div class="toolbar"><button class="btn sm" onclick="mkDraft()">✨ Draft a new post</button></div>
+<div class="grid">${M.posts.filter(p=>p.st=='Awaiting approval').map(p=>`<div class="card"><div class="ph">📷 ${p.img}</div><p id="cap${p.id}">${p.cap}</p><p class="muted">${p.tags}</p><p class="muted">${p.ch} · ${p.date}</p><button class="btn sm" onclick="mkSet(${p.id},'Scheduled (demo)')">Approve & schedule</button> <button class="btn sm dark" onclick="mkEdit(${p.id})">Edit</button> <button class="btn sm dark" onclick="mkSet(${p.id},'Declined')">Decline</button></div>`).join('')||'<p class="muted">Nothing waiting. Ask the bot to draft one.</p>'}</div>
+<h3>Content calendar · next 14 days</h3>${tbl(['Date','Channel','Post','Status'],cal.flatMap(d=>M.posts.filter(p=>p.date==d&&p.st!='Declined').map(p=>[d,p.ch,p.cap.slice(0,60)+'…',pill(p.st)])))}`}
+window.mkCon=k=>{mkData().con[k]=1;save();toast('Connected (demo): no real account was linked');render()};
+window.mkSet=(id,s)=>{const p=mkData().posts.find(p=>p.id==id);p.st=s;if(s.startsWith('Scheduled'))D.sent.unshift({t:new Date().toLocaleString(),what:'Post scheduled (demo, never published) on '+p.ch+': '+p.cap.slice(0,50)});save();toast(s.startsWith('Scheduled')?'Scheduled (demo): nothing will really post':'Declined');render()};
+window.mkEdit=id=>{const p=mkData().posts.find(p=>p.id==id),c=prompt('Edit caption',p.cap);if(c){p.cap=c;save();render()}};
+window.mkDraft=()=>{const M=mkData(),s=(window.MK_SEED||[])[M.posts.length%MK_SEED.length];M.posts.push({...s,id:M.posts.length+1,date:new Date(Date.now()+(2+M.posts.length%10)*864e5).toISOString().slice(0,10),st:'Awaiting approval'});save();toast('Marketing bot drafted a post');render()};
