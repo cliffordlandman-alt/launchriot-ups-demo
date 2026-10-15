@@ -66,3 +66,4 @@ animation:glw 10s ease-in-out infinite alternate}
 @keyframes glw{to{transform:translateX(3%) scale(1.04);opacity:.85}}
 @media (prefers-reduced-motion:reduce){.hero:before,.hero:after{animation:none}}
 .sect{text-align:center;margin:18px 0 14px}.boticon{font-size:28px}.bots h3{margin:6px 0}
+.lr-img{height:32px;width:auto;display:block}
